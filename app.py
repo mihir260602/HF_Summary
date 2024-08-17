@@ -1,251 +1,58 @@
-import streamlit as st
-import requests
-import time
-import validators
+import validators,streamlit as st
 from langchain.prompts import PromptTemplate
+from langchain_groq import ChatGroq
 from langchain.chains.summarize import load_summarize_chain
-from langchain.document_loaders import YoutubeLoader, UnstructuredURLLoader
-from langchain.llms import HuggingFaceEndpoint
+from langchain_community.document_loaders import YoutubeLoader,UnstructuredURLLoader
+from langchain_huggingface import HuggingFaceEndpoint
 
-# Custom CSS
-st.markdown("""
-    <style>
-    body {
-        background-color: beige;
-        color: black;
-        font-family: Arial, sans-serif;
-    }
-    .stButton > button {
-        background-color: beige;
-        color: black;
-        border: 1px solid black;
-        padding: 10px 20px;
-        border-radius: 5px;
-        transition: background-color 0.3s, color 0.3s;
-    }
-    .stButton > button:hover {
-        background-color: darkred;
-        color: black;
-    }
-    .stTextInput > div > div > input {
-        color: beige;
-        background-color: black;
-        border: 1px solid black;
-        padding: 10px;
-        border-radius: 5px;
-    }
-    .stTextInput > div > label {
-        color: black;
-    }
-    .stMarkdown, .stTitle, .stHeader, .stSubheader {
-        color: black;
-    }
-    .stApp {
-        background-color: beige;
-    }
-    .stResult {
-        color: beige;
-        background-color: black;
-        border-radius: 5px;
-        padding: 10px;
-        border: 1px solid black;
-        margin-top: 10px;
-        width: 200%;
-        box-sizing: border-box;
-    }
-    .stResult > div {
-        background-color: black;
-        color: beige;
-    }
-    .stText, .stTextInput, .stMarkdown {
-        color: black;
-    }
-    .stTextInput > div > div > input {
-        color: beige;
-        background-color: black;
-        border: 1px solid black;
-    }
-    .stMarkdown {
-        color: black;
-    }
-    .url-history {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        margin-top: 20px;
-    }
-    .url-entry {
-        position: relative;
-        width: 45%;
-        background-color: black;
-        color: beige;
-        border-radius: 5px;
-        overflow: hidden;
-        transition: background-color 0.3s, color 0.3s;
-    }
-    .url-entry:hover .url-summary {
-        display: block;
-    }
-    .url-summary {
-        display: none;
-        padding: 10px;
-        color: beige;
-        background-color: black;
-        border-top: 1px solid beige;
-    }
-    .url-link {
-        padding: 10px;
-        background-color: black;
-        color: beige;
-        text-align: center;
-        font-weight: bold;
-        border-bottom: 1px solid beige;
-        transition: background-color 0.3s, color 0.3s;
-    }
-    .url-entry:hover .url-link {
-        background-color: darkred;
-        color: black;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
-# Initialize session state for API key, URL history, and summaries
-if "hf_api_key" not in st.session_state:
-    st.session_state.hf_api_key = ""
-if "url_history" not in st.session_state:
-    st.session_state.url_history = []
+## sstreamlit APP
+st.set_page_config(page_title="LangChain: Summarize Text From YT or Website", page_icon="🦜")
+st.title("🦜 LangChain: Summarize Text From YT or Website")
+st.subheader('Summarize URL')
 
-# Page to enter Hugging Face API Key
-if not st.session_state.hf_api_key:
-    st.title("Enter Hugging Face API Key")
-    st.session_state.hf_api_key = st.text_input("Hugging Face API Token", value="", type="password")
 
-    if st.button("Submit"):
-        if st.session_state.hf_api_key.strip():
-            st.session_state.submitted = True
-            st.experimental_set_query_params(submitted=True)
-        else:
-            st.error("Please provide the Hugging Face API key to proceed.")
-else:
-    # Main functionality page after API key is provided
-    st.title("🦜 LangChain: Summarize Text From YT or Website")
-    st.subheader('Summarize URL')
 
-    # Input field for URL
-    generic_url = st.text_input("URL", label_visibility="collapsed")
+## Get the Groq API Key and url(YT or website)to be summarized
+with st.sidebar:
+    hf_api_key=st.text_input("Huggingface API Token",value="",type="password")
 
-    # Summarize and Clear buttons
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        if st.button("Summarize the Content from YT or Website"):
-            # Validate all the inputs
-            if not generic_url.strip():
-                st.error("Please provide the URL to get started.")
-            elif not validators.url(generic_url):
-                st.error("Please enter a valid URL. It can be a YT video URL or website URL.")
-            else:
-                try:
-                    st.write(f"Processing URL: {generic_url}")
-                    with st.spinner("Waiting..."):
-                        # Add the current URL to history
-                        st.session_state.url_history.append({"url": generic_url, "summary": ""})
+generic_url=st.text_input("URL",label_visibility="collapsed")
 
-                        # Convert shortened YouTube URL if needed
-                        def convert_youtube_short_url(url):
-                            if "youtu.be" in url:
-                                video_id = url.split('/')[-1].split('?')[0]
-                                return f"https://www.youtube.com/watch?v={video_id}"
-                            return url
+## Gemma Model USsing Groq API
+##llm =ChatGroq(model="Gemma-7b-It", groq_api_key=groq_api_key)
+repo_id="mistralai/Mistral-7B-Instruct-v0.3"
+llm=HuggingFaceEndpoint(repo_id=repo_id,max_length=150,temperature=0.7,token=hf_api_key)
 
-                        generic_url = convert_youtube_short_url(generic_url)
+prompt_template="""
+Provide a summary of the following content in 300 words:
+Content:{text}
 
-                        # Custom function to fetch content with a user-agent header
-                        def fetch_content(url):
-                            headers = {
-                                'User-Agent': 'your-bot 0.1'
-                            }
-                            response = requests.get(url, headers=headers)
-                            response.raise_for_status()  # Raise HTTPError for bad responses
-                            return response.text
+"""
+prompt=PromptTemplate(template=prompt_template,input_variables=["text"])
 
-                        # Loading the website or YT video data
-                        if "youtube.com" in generic_url:
-                            st.write("Detected YouTube URL. Attempting to load video...")
-                            loader = YoutubeLoader.from_youtube_url(generic_url, add_video_info=True)
-                        else:
-                            st.write("Detected website URL. Attempting to load...")
-                            content = fetch_content(generic_url)
-                            loader = UnstructuredURLLoader(
-                                urls=[generic_url],
-                                ssl_verify=False,
-                                headers={"User-Agent": "your-bot 0.1"}
-                            )
-                            # Mock loading since we don't have actual loader support for raw HTML
-                            docs = [{'page_content': content}]
-                        
-                        docs = loader.load()
+if st.button("Summarize the Content from YT or Website"):
+    ## Validate all the inputs
+    if not hf_api_key.strip() or not generic_url.strip():
+        st.error("Please provide the information to get started")
+    elif not validators.url(generic_url):
+        st.error("Please enter a valid Url. It can may be a YT video utl or website url")
 
-                        # Check what was loaded
-                        if not docs or not docs[0].page_content.strip():
-                            st.error("Unable to retrieve content from the provided URL.")
-                        else:
-                            st.write(f"Retrieved {len(docs)} documents.")
-                            # Chain for Summarization
-                            repo_id = "mistralai/Mistral-7B-Instruct-v0.3"
-                            llm = HuggingFaceEndpoint(repo_id=repo_id, max_length=150, temperature=0.7, token=st.session_state.hf_api_key)
+    else:
+        try:
+            with st.spinner("Waiting..."):
+                ## loading the website or yt video data
+                if "youtube.com" in generic_url:
+                    loader=YoutubeLoader.from_youtube_url(generic_url,add_video_info=True)
+                else:
+                    loader=UnstructuredURLLoader(urls=[generic_url],ssl_verify=False,
+                                                 headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"})
+                docs=loader.load()
 
-                            prompt_template = """
-                            Provide a summary of the following content in 300 words:
-                            Content: {text}
-                            """
-                            prompt = PromptTemplate(template=prompt_template, input_variables=["text"])
-                            chain = load_summarize_chain(llm, chain_type="stuff", prompt=prompt)
+                ## Chain For Summarization
+                chain=load_summarize_chain(llm,chain_type="stuff",prompt=prompt)
+                output_summary=chain.run(docs)
 
-                            # Retry logic for handling rate limits
-                            retry_attempts = 5  # Increased number of retries
-                            delay = 10  # Starting delay in seconds
-
-                            for attempt in range(retry_attempts):
-                                try:
-                                    output_summary = chain.run(docs)
-                                    # Update session state with the summary
-                                    st.session_state.url_history[-1]["summary"] = output_summary
-                                    st.markdown(f"<div class='stResult'>{output_summary}</div>", unsafe_allow_html=True)
-                                    break
-                                except Exception as e:
-                                    if "429 Client Error: Too Many Requests" in str(e):
-                                        if attempt < retry_attempts - 1:
-                                            st.write(f"Rate limit exceeded. Retrying in {delay} seconds...")
-                                            time.sleep(delay)
-                                            delay *= 2  # Exponential backoff
-                                        else:
-                                            st.error("Rate limit exceeded. Please try again later or upgrade your API plan.")
-                                    else:
-                                        st.exception(f"Exception: {e}")
-                                        break
-                except Exception as e:
-                    st.exception(f"Exception: {e}")
-
-    with col2:
-        if st.button("Clear"):
-            st.session_state.url_history = []
-            st.experimental_set_query_params()
-
-    # Display URL History with summaries and URLs side by side
-    if st.session_state.url_history:
-        st.write("### URL History")
-        url_history_container = st.container()
-        with url_history_container:
-            st.markdown('<div class="url-history">', unsafe_allow_html=True)
-            for item in st.session_state.url_history:
-                st.markdown(f"""
-                    <div class="url-entry">
-                        <div class="url-link">
-                            <a href="{item['url']}" target="_blank">{item['url']}</a>
-                        </div>
-                        <div class="url-summary">
-                            {item['summary']}
-                        </div>
-                    </div>
-                """, unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+                st.success(output_summary)
+        except Exception as e:
+            st.exception(f"Exception:{e}")
