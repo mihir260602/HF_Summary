@@ -55,6 +55,7 @@ st.markdown("""
     }
     .stResult > div {
         background-color: beige;
+        width: 150%;
         color: black;
     }
     .stText, .stTextInput, .stMarkdown {
@@ -92,6 +93,7 @@ st.markdown("""
         padding: 10px;
         color: black;
         background-color: beige;
+        width: 150%;
         border-top: 1px solid black;
     }
     .url-link {
@@ -101,6 +103,7 @@ st.markdown("""
         text-align: center;
         font-weight: bold;
         border-bottom: 1px solid black;
+        width: 150%;
         transition: background-color 0.3s, color 0.3s;
     }
     .url-entry:hover .url-link {
