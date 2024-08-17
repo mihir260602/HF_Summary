@@ -50,7 +50,7 @@ st.markdown("""
         padding: 10px;
         border: 1px solid beige;
         margin-top: 10px;
-        width: 200%;
+        width: 150%;
         box-sizing: border-box;
     }
     .stResult > div {
@@ -72,6 +72,7 @@ st.markdown("""
         display: flex;
         flex-wrap: wrap;
         gap: 20px;
+        width: 150%;
         margin-top: 20px;
     }
     .url-entry {
