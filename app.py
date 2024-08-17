@@ -73,7 +73,7 @@ st.markdown("""
         display: flex;
         flex-wrap: wrap;
         gap: 20px;
-        width: 100%;
+        width: 50%;
         margin-top: 20px;
     }
     .url-entry {
