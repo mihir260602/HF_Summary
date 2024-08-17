@@ -11,62 +11,62 @@ import requests
 st.markdown("""
     <style>
     body {
-        background-color: black;
-        color: beige;
+        background-color: beige;
+        color: black;
         font-family: Arial, sans-serif;
     }
     .stButton > button {
-        background-color: black;
-        color: beige;
-        border: 1px solid beige;
+        background-color: beige;
+        color: black;
+        border: 1px solid black;
         padding: 10px 20px;
         border-radius: 5px;
         transition: background-color 0.3s, color 0.3s;
     }
     .stButton > button:hover {
         background-color: darkred;
-        color: beige;
+        color: black;
     }
     .stTextInput > div > div > input {
-        color: black;
-        background-color: beige;
-        border: 1px solid beige;
+        color: beige;
+        background-color: black;
+        border: 1px solid black;
         padding: 10px;
         border-radius: 5px;
     }
     .stTextInput > div > label {
-        color: beige;
+        color: black;
     }
     .stMarkdown, .stTitle, .stHeader, .stSubheader {
-        color: beige;
+        color: black;
     }
     .stApp {
-        background-color: black;
+        background-color: beige;
     }
     .stResult {
-        color: black;
-        background-color: beige;
+        color: beige;
+        background-color: black;
         border-radius: 5px;
         padding: 10px;
-        border: 1px solid beige;
+        border: 1px solid black;
         margin-top: 10px;
         width: 200%;
         box-sizing: border-box;
     }
     .stResult > div {
-        background-color: beige;
-        color: black;
+        background-color: black;
+        color: beige;
     }
     .stText, .stTextInput, .stMarkdown {
-        color: beige;
+        color: black;
     }
     .stTextInput > div > div > input {
-        color: black;
-        background-color: beige;
-        border: 1px solid beige;
+        color: beige;
+        background-color: black;
+        border: 1px solid black;
     }
     .stMarkdown {
-        color: beige;
+        color: black;
     }
     .url-history {
         display: flex;
@@ -77,8 +77,8 @@ st.markdown("""
     .url-entry {
         position: relative;
         width: 45%;
-        background-color: beige;
-        color: black;
+        background-color: black;
+        color: beige;
         border-radius: 5px;
         overflow: hidden;
         transition: background-color 0.3s, color 0.3s;
@@ -89,22 +89,22 @@ st.markdown("""
     .url-summary {
         display: none;
         padding: 10px;
-        color: black;
-        background-color: beige;
-        border-top: 1px solid black;
+        color: beige;
+        background-color: black;
+        border-top: 1px solid beige;
     }
     .url-link {
         padding: 10px;
-        background-color: beige;
-        color: black;
+        background-color: black;
+        color: beige;
         text-align: center;
         font-weight: bold;
-        border-bottom: 1px solid black;
+        border-bottom: 1px solid beige;
         transition: background-color 0.3s, color 0.3s;
     }
     .url-entry:hover .url-link {
         background-color: darkred;
-        color: beige;
+        color: black;
     }
     </style>
     """, unsafe_allow_html=True)
