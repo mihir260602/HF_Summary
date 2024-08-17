@@ -55,7 +55,6 @@ st.markdown("""
     }
     .stResult > div {
         background-color: beige;
-        width: 150%;
         color: black;
     }
     .stText, .stTextInput, .stMarkdown {
