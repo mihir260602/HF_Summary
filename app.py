@@ -85,12 +85,12 @@ if "hf_api_key" not in st.session_state:
     if st.button("Submit"):
         if hf_api_key.strip():
             st.session_state["hf_api_key"] = hf_api_key
-            st.experimental_rerun()
+            # Instead of rerunning, we just render the main content below
         else:
             st.error("Please provide a valid Hugging Face API token.")
 
 # Page 2: Main Summarization Page
-else:
+if "hf_api_key" in st.session_state:
     st.title("🦜 LangChain: Summarize Text From YT or Website")
     st.subheader("Enter a YouTube or Website URL to generate a summary")
 
