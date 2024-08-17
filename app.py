@@ -50,7 +50,7 @@ st.markdown("""
         padding: 10px;
         border: 1px solid black;
         margin-top: 10px;
-        width: 150%;
+        width: 200%;
         box-sizing: border-box;
     }
     .stResult > div {
@@ -122,7 +122,8 @@ if not st.session_state.hf_api_key:
 
     if st.button("Submit"):
         if st.session_state.hf_api_key.strip():
-            st.experimental_rerun()
+            st.session_state.submitted = True
+            st.experimental_set_query_params(submitted=True)
         else:
             st.error("Please provide the Hugging Face API key to proceed.")
 else:
@@ -228,7 +229,7 @@ else:
     with col2:
         if st.button("Clear"):
             st.session_state.url_history = []
-            st.experimental_rerun()
+            st.experimental_set_query_params()
 
     # Display URL History with summaries and URLs side by side
     if st.session_state.url_history:
