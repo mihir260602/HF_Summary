@@ -31,3 +31,5 @@ unstructured
 pytube
 numexpr
 huggingface_hub
+validators
+requests
