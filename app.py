@@ -50,7 +50,7 @@ st.markdown("""
         padding: 10px;
         border: 1px solid black;
         margin-top: 10px;
-        width: 200%;
+        width: 175%;
         box-sizing: border-box;
     }
     .stResult > div {
