@@ -1,11 +1,11 @@
 import streamlit as st
-import validators
-import time
-from langchain.prompts import PromptTemplate
-from langchain_huggingface import HuggingFaceEndpoint
-from langchain_community.document_loaders import YoutubeLoader, UnstructuredURLLoader
-from langchain.chains import load_summarize_chain
 import requests
+import time
+import validators
+from langchain.prompts import PromptTemplate
+from langchain.chains.summarize import load_summarize_chain
+from langchain.document_loaders import YoutubeLoader, UnstructuredURLLoader
+from langchain.llms import HuggingFaceEndpoint
 
 # Custom CSS
 st.markdown("""
