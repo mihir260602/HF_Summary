@@ -55,6 +55,7 @@ st.markdown("""
     }
     .stResult > div {
         background-color: beige;
+        width: 150%;
         color: black;
     }
     .stText, .stTextInput, .stMarkdown {
@@ -72,11 +73,12 @@ st.markdown("""
         display: flex;
         flex-wrap: wrap;
         gap: 20px;
+        width: 150%;
         margin-top: 20px;
     }
     .url-entry {
         position: relative;
-        width: 150%; /* Updated width */
+        width: 100%; /* Updated width */
         background-color: beige;
         color: black;
         border-radius: 5px;
